@@ -236,9 +236,9 @@ void iniparser_dump(const dictionary * d, FILE * f)
         if (d->key[i]==NULL)
             continue ;
         if (d->val[i]!=NULL) {
-            fprintf(f, "[%s]=[%s]\n", d->key[i], d->val[i]);
+            fprintf(f, "%s=%s\n", d->key[i], d->val[i]);
         } else {
-            fprintf(f, "[%s]=UNDEF\n", d->key[i]);
+            fprintf(f, "%s=UNDEF\n", d->key[i]);
         }
     }
     return ;

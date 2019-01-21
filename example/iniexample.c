@@ -20,7 +20,61 @@ int main(int argc, char * argv[])
     }
     return status ;
 }
+char * getkeyvalue(const char *section, const char *key,  char *val, const char* ini_name){
+    dictionary  *   ini ;
 
+    /* Some temporary variables to hold query results */
+
+    const char  *   s ;
+    char str[255] = {0};
+    ini = iniparser_load(ini_name);
+    if (ini==NULL) {
+        fprintf(stderr, "cannot parse file: %s %s\n", ini_name, __func__);
+        return "" ;
+    }
+    sprintf(str, ":%s:%s", section, key);
+    s = iniparser_getstring(ini, str, NULL);
+    if(s)
+        strcpy(val , s);
+    iniparser_freedict(ini);
+    return val;
+}
+int setkeyvalue(const char *section,const char *key, const char *val, const char *ini_name ){
+    dictionary  *   dic ;
+    FILE    *   ini ;
+    /* Some temporary variables to hold query results */
+
+    const char  *   s ;
+    char str[255] = {0};
+    dic = iniparser_load(ini_name);
+    if (dic==NULL) {
+        fprintf(stderr, "cannot parse file: %s %s\n", ini_name, __func__);
+        dic = dictionary_new(2);
+    }
+    sprintf(str, "%s:%s", section, key);
+
+    if ((ini=fopen(ini_name, "w"))==NULL) {
+        fprintf(stderr, "iniparser: cannot create example.ini\n");
+        goto End ;
+    }    
+    dictionary_set(dic, str,val);
+    iniparser_dump(dic, ini);
+
+    fclose(ini);
+  End:  
+    iniparser_freedict(dic);
+    return 0;
+}
+void save_ini_file( dictionary  *   dic, const char *sec){
+    FILE    *   ini ;
+
+    if ((ini=fopen("example.ini", "w"))==NULL) {
+        fprintf(stderr, "iniparser: cannot create example.ini\n");
+        return ;
+    }    
+    iniparser_dump_ini(dic, ini);
+    fclose(ini);
+}
 void create_example_ini_file(void)
 {
     FILE    *   ini ;
@@ -57,20 +111,25 @@ void create_example_ini_file(void)
 int parse_ini_file(char * ini_name)
 {
     dictionary  *   ini ;
-
+    char buf[255]={0};
     /* Some temporary variables to hold query results */
     int             b ;
     int             i ;
     double          d ;
     const char  *   s ;
 
-    ini = iniparser_load(ini_name);
-    if (ini==NULL) {
-        fprintf(stderr, "cannot parse file: %s\n", ini_name);
-        return -1 ;
-    }
-    iniparser_dump(ini, stderr);
+    // ini = iniparser_load(ini_name);
+    // if (ini==NULL) {
+    //     ini = dictionary_new(2);
+    //     fprintf(stderr, "cannot parse file: %s %s\n", ini_name, __func__);
+    // //    return -1 ;
+    // }
+  //  iniparser_dump(ini, stderr);
 
+    setkeyvalue("menu","author", "xxx", ini_name);
+    s = getkeyvalue("menu", "author", buf,ini_name);
+    printf("author:  [%s]\n", s ? s : "UNDEF");
+    return 0;
     /* Get pizza attributes */
     printf("Pizza:\n");
 
@@ -97,6 +156,12 @@ int parse_ini_file(char * ini_name)
     d = iniparser_getdouble(ini, "wine:alcohol", -1.0);
     printf("Alcohol:   [%g]\n", d);
 
+    s = iniparser_getstring(ini, ":menu:author", NULL);
+    printf("author:     [%s]\n", s ? s : "UNDEF");
+
+    dictionary_set(ini, "menu:author","aaa");
+    dictionary_set(ini, "menu:author","bbb");
+    save_ini_file(ini,"menu");
     iniparser_freedict(ini);
     return 0 ;
 }
