@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/ndevilla/iniparser.svg?branch=master)](https://travis-ci.org/ndevilla/iniparser)
 
 # Iniparser 4 #
-
+ - add for android static library surpport by billnie
 
 ## I - Overview
 
