@@ -32,7 +32,7 @@ char * getkeyvalue(const char *section, const char *key,  char *val, const char*
         fprintf(stderr, "cannot parse file: %s %s\n", ini_name, __func__);
         return "" ;
     }
-    sprintf(str, ":%s:%s", section, key);
+    sprintf(str, "%s:%s", section, key);
     s = iniparser_getstring(ini, str, NULL);
     if(s)
         strcpy(val , s);
@@ -49,7 +49,9 @@ int setkeyvalue(const char *section,const char *key, const char *val, const char
     dic = iniparser_load(ini_name);
     if (dic==NULL) {
         fprintf(stderr, "cannot parse file: %s %s\n", ini_name, __func__);
-        dic = dictionary_new(2);
+        dic = dictionary_new(1);
+    }else{
+
     }
     sprintf(str, "%s:%s", section, key);
 
@@ -57,9 +59,10 @@ int setkeyvalue(const char *section,const char *key, const char *val, const char
         fprintf(stderr, "iniparser: cannot create example.ini\n");
         goto End ;
     }    
+    dictionary_set(dic, section,NULL);
     dictionary_set(dic, str,val);
-    iniparser_dump(dic, ini);
-
+ //   iniparser_dump(dic, ini);
+    iniparser_dumpsection_ini(dic,section, ini);
     fclose(ini);
   End:  
     iniparser_freedict(dic);
@@ -126,7 +129,8 @@ int parse_ini_file(char * ini_name)
     // }
   //  iniparser_dump(ini, stderr);
 
-    setkeyvalue("menu","author", "xxx", ini_name);
+    setkeyvalue("menu","author", "billnie", ini_name);
+    setkeyvalue("menu","version", "1.0", ini_name);
     s = getkeyvalue("menu", "author", buf,ini_name);
     printf("author:  [%s]\n", s ? s : "UNDEF");
     return 0;
